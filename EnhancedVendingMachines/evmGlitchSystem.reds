@@ -121,14 +121,14 @@ protected func ShutDownMachine() -> Void {
   // this.GetDevicePS().SetDeviceState(this.GetDeviceState().OFF);
 
   //remove all kind of interactions (extra safety)
-  this.m_interaction.Toggle(false);
+  this.m_interaction.Toggle(false); // dont want this off
   this.uiSlotComponent.Toggle(false);
   this.SetScannerDirty(true);
 }
 
 
 class EVMRepeatShortGlitchEvent extends Event {
-  // intentionally empty?
+  // intentionally empty
 }
 
 @addMethod(DropPoint)
@@ -136,82 +136,34 @@ protected cb func OnEVMRepeatShortGlitchEvent(evt:ref<EVMRepeatShortGlitchEvent>
 	this.EVMResetShortGlitchCycle();
 }
 
-// vehicleComponent.script
 @addMethod(DropPoint)
 protected func EVMSetupRepeatShortGlitchListener() -> Void {
 	if this._timeSystemCallbackID == 0 {
     let evt: ref<EVMRepeatShortGlitchEvent> = new EVMRepeatShortGlitchEvent();
-    let randomSeconds = RandRange(3, 12);
-    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, randomSeconds); // days, hours, opt minutes, opt seconds
+    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, 10); // days, hours, opt minutes, opt seconds
+    // Make the numbers bigger since game time is faster than real time. Might also be able to replace with real time in the future.
+    // If I'm understanding this correctly, this is dirty coding. The event gets called every 10 game-seconds. Since EVMResetShortGlitchCycle uses a random delay, StartShortGlitch will not occur in-game because another short glitch is already occuring. So it seems more random than it is since some short glitches are skipped. Or it could be that this event waits until RepeatDelayedShortGlitch is finished. Who knows.
 		this._timeSystemCallbackID = Cast<Int32>(GameInstance.GetTimeSystem(this.GetDevicePS().GetGameInstance()).RegisterDelayedListener(this, evt, delay, -1));
     // RegisterDelayedListener(entity:weak<Entity>, eventToDelay:Event, delay:GameTime, repeat:Int32, opt sendOldNoifications:Bool) -> Uint32;
+    // argument repeat:Int32 repeats that many times (10 times if set to 10) or infinitely if it's set to -1.
 		this.EVMResetShortGlitchCycle();
 	};
 }
 
 @addMethod(DropPoint)
 protected func EVMResetShortGlitchCycle() -> Void {
-  this.StartShortGlitch();
+  let delaySystem: ref<DelaySystem> = GameInstance.GetDelaySystem(this.GetGame());
+  let callback: ref<RepeatDelayedShortGlitch> = new RepeatDelayedShortGlitch();
+  callback.dropPoint = this;
+  delaySystem.DelayCallback(callback, RandRangeF(2, 6), true);
 }
 
-
-// public class RepeatDelayedShortGlitch extends DelayCallback {
-//   let dropPoint: ref<DropPoint>;
-
-//   protected func Call() -> Void {
-//     this.dropPoint.StartShortGlitch();
-//   }
-// }
-
-
-	// protected function PassGameTimeToVehBB()
-	// {
-	// 	var timeSys : TimeSystem;
-	// 	var currTime : GameTime;
-	// 	var timeString : String;
-	// 	var hours : Int32;
-	// 	timeSys = GameInstance.GetTimeSystem( GetVehicle().GetGame() );
-	// 	currTime = timeSys.GetGameTime();
-	// 	hours = GameTime.Hours( currTime );
-	// 	if( hours > 12 )
-	// 	{
-	// 		hours = hours - 12;
-	// 	}
-	// 	timeString = ( StrReplace( SpaceFill( IntToString( hours ), 2, ESpaceFillMode.JustifyRight ), " ", "0" ) + ":" ) + StrReplace( SpaceFill( IntToString( GameTime.Minutes( currTime ) ), 2, ESpaceFillMode.JustifyRight ), " ", "0" );
-	// 	m_vehicleBlackboard.SetString( GetAllBlackboardDefs().Vehicle.GameTime, timeString );
-	// }
-
-
-
-// vehicleComponent.script
-	// protected function SetupGameTimeToBBListener()
-	// {
-	// 	var delay : GameTime;
-	// 	var evt : MinutePassedEvent;
-	// 	if( m_timeSystemCallbackID == ( ( Uint32 )( 0 ) ) )
-	// 	{
-	// 		evt = new MinutePassedEvent;
-	// 		delay = GameTime.MakeGameTime( 0, 0, 1, 0 );
-	// 		m_timeSystemCallbackID = GameInstance.GetTimeSystem( GetVehicle().GetGame() ).RegisterDelayedListener( GetVehicle(), evt, delay, -1 );
-	// 		PassGameTimeToVehBB();
-	// 	}
-	// }
-
-
-
-  // let delaySystem: ref<DelaySystem> = GameInstance.GetDelaySystem(this.GetGame());
-  // let callback: ref<EVMDispenseEddieBundles> = new EVMDispenseEddieBundles();
-  // callback.vendingMachine = this;
-  // callback.lootManager = GameInstance.GetLootManager(this.GetGame());
-  // ArrayPush(callback.dropInstructions, DropInstruction.Create(moneyItem, quantity));
-  // delaySystem.DelayCallback(callback, 0, true);
-
-	// public function SetAsQuickHack( optional wasExecutedAtLeastOnce : Bool )
-	// {
-	// 	m_isQuickHack = true;
-	// 	m_wasPerformedOnOwner = wasExecutedAtLeastOnce;
-	// 	ProduceInteractionParts();
-	// }
+public class RepeatDelayedShortGlitch extends DelayCallback {
+  let dropPoint: ref<DropPoint>;
+  protected func Call() -> Void {
+    this.dropPoint.StartShortGlitch();
+  }
+}
 
 
 // @addField(InteractiveDevice) // leaving this on didnt work
