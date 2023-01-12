@@ -13,117 +13,61 @@ let _timeSystemCallbackID: Int32; // do not remove underscore. timeSystemCallbac
 protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   let settings = new evmMenuSettings();
-  let dpMalfunctionRate = settings.evmDropPointMalfunctionRate;
+  let dpMalfunctionRate: Int32 = settings.evmDropPointMalfunctionRate;
   if dpMalfunctionRate == 0 { return; };
-  let totalSum = settings.evmDropPointStaticGlitch + settings.evmDropPointShortGlitch + settings.evmDropPointBroken;
+  let totalSum: Int32 = settings.evmDropPointStaticGlitch + settings.evmDropPointShortGlitch + settings.evmDropPointBroken;
   if totalSum == 0 { totalSum = 1; };
   let dpStaticLimit = Cast<Float>(settings.evmDropPointStaticGlitch / totalSum * dpMalfunctionRate / 100);
   let dpShortLimit = Cast<Float>(settings.evmDropPointShortGlitch / totalSum * dpMalfunctionRate / 100) + dpStaticLimit;
   let dpBrokenLimit = Cast<Float>(settings.evmDropPointBroken / totalSum * dpMalfunctionRate / 100) + dpShortLimit;
   let randomNum = RandRangeF(0, 1);
-  // let delaySystem: ref<DelaySystem> = GameInstance.GetDelaySystem(this.GetGame());
-  // evmTimeSystem = GameInstance.GetTimeSystem(this.GetDevicePS().GetGameInstance());
 
-  // this.ActivateDevice();
   if 0.0 < randomNum && randomNum <= dpStaticLimit {
     this.StartGlitching(EGlitchState.DEFAULT, 1.0);
     this.GetDevicePS().evmHackCount = 0;
     return;
   };
   if randomNum <= dpShortLimit {
-    // let callback: ref<RepeatDelayedShortGlitch> = new RepeatDelayedShortGlitch();
-    // callback.dropPoint = this;
     this.GetDevicePS().evmHackCount = 1;
     if Equals(this.GetDeviceState(), EDeviceStatus.ON)
     && this.GetDevicePS().evmHackCount > 0 {
       this.EVMSetupRepeatShortGlitchListener();
-      // let randomTimer = RandRangeF(2, 8);
-      // delaySystem.DelayCallback(callback, randomTimer, true);
     };
-
-    // timeSystem.RegisterIntervalListener(this, callback, 1, 10, 10);
     return;
   };
   if randomNum <= dpBrokenLimit {
     this.ShutDownMachine();
-    return;
   };
 }
 
 
 @addMethod(DropPoint)
 protected func ShutDownMachine() -> Void {
-//     this.TurnOffDevice();
-//     this.RefreshInteraction();
+  // this is from DeactivateDevice() on VendingMachine and all its supers
+  // VendingMachine <- (skips BasicDistractionDevice) <- InteractiveDevice <- Device <- DeviceBase
+  // this.CutPower(); // isn't needed cuz it calls RevealNetworkGrid/RevealDevicesGrid
+	this.RevealNetworkGrid( false );
+	this.RevealDevicesGrid( false );
+	this.SetGameplayRoleToNone();
+	GameObject.UntagObject( this );
+	this.m_isPlayerAround = false;
 
-//     let data:ref<FocusForcedHighlightData> = new FocusForcedHighlightData();
-//     let highlightData: ref<HighlightInstance> = new HighlightInstance();
-//     data.highlightType = EFocusForcedHighlightType.CLUE;
-//     data.outlineType = EFocusOutlineType.CLUE;
-//     data.priority = EPriority.Absolute;
-//     data.patternType = VisionModePatternType.Default;
-//     data.isRevealed = false;
-//     data.isSavable = false;
-//     this.GetDevicePS().m_exposeQuickHacks = false;
-//     this.GetDevicePS().ExposeQuickHacks(false);
-//     this.GetDevicePS().m_disableQuickHacks = true;
-//     this.GetDevicePS().UnpowerDevice();
-//     highlightData.context = HighlightContext.DEFAULT;
-//     highlightData.state = InstanceState.HIDDEN;
-//     data.InitializeWithHudInstruction(highlightData);
-//     this.m_scanningComponent.ForceVisionAppearance(data);
-//     this.m_scanningComponent.SetBlocked(false);
-//     this.m_interaction.Toggle(false);
-//     this.uiSlotComponent.Toggle(false);
-//     this.SetScannerDirty(true);
-//     let hudData:ref<HUDActorUpdateData> = new HUDActorUpdateData();
-//     hudData.updateVisibility = true;
-//     hudData.canOpenScannerInfoValue = false;
-//     hudData.visibilityValue = ActorVisibilityStatus.OUTSIDE_CAMERA;
-//     this.RequestHUDRefresh(hudData);
+  // it works with just the code above
 
+  // this is from TurnOff(), its supers, and 1-2 other places
+	// this.m_advUiComponent.Toggle( false );
+	// this.ToggleLights( false );
+  // this.StopTransformDistractAnimation("turnON");
 
+  // this.m_isUIdirty = true; // I have no idea what this does but I think it isn't needed.
 
+  // this.RestoreDeviceState(); // this turned it back on lol
 
-
-
-
-
-    // this.RefreshInteraction();
-    // //remove quickhacks
-    // this.GetDevicePS().ExposeQuickHacks(false);
-    // this.GetDevicePS().m_disableQuickHacks = true;
-
-    // //safety
-    // this.TurnOffDevice();
-    // //this unpowers the device and removes nearly everything (including the highlight)
-    // this.GetDevicePS().UnpowerDevice();
-
-    // //remove all kind of interactions (extra safety)
-    // this.m_interaction.Toggle(false);
-    // this.uiSlotComponent.Toggle(false);
-    // this.SetScannerDirty(true);
-
-
-
-
-  this.RefreshInteraction();
-
-  //remove quickhacks
-  this.GetDevicePS().ExposeQuickHacks(false);
-  this.GetDevicePS().m_disableQuickHacks = true;
-
-  //safety
-  // Simply using DeactivateDevice() on DropPoint isnt enough becuz quickhack options still show when scanning. Only using this.GetDevicePS().SetDeviceState(this.GetDeviceState().OFF); results in an error message saying the power is out, but I want it to look entirely broken.
-  this.DeactivateDevice(); // DeactivateDevice() <- TurnOffDevice() <- TurnOffScreen() <- m_uiComponent.Toggle(false);
-  //this unpowers the device and removes nearly everything (including the highlight)
-  this.GetDevicePS().UnpowerDevice(); // this is probably better than 'this.GetDevicePS().SetDeviceState(this.GetDeviceState().OFF)'
-  // this.GetDevicePS().SetDeviceState(this.GetDeviceState().OFF);
-
-  //remove all kind of interactions (extra safety)
-  this.m_interaction.Toggle(false); // dont want this off
-  this.uiSlotComponent.Toggle(false);
-  this.SetScannerDirty(true);
+  // everything below is valid but doesn't do anything that the above code doesn't already do.
+	this.m_uiComponent.Toggle( false );
+  this.m_interactionIndicator.ToggleLight( false );
+  this.UpdateDeviceState();
+	this.HandleMappinRregistration( false );
 }
 
 
@@ -132,26 +76,20 @@ class EVMRepeatShortGlitchEvent extends Event {
 }
 
 @addMethod(DropPoint)
-protected cb func OnEVMRepeatShortGlitchEvent(evt:ref<EVMRepeatShortGlitchEvent>) {
-	this.EVMResetShortGlitchCycle();
-}
-
-@addMethod(DropPoint)
 protected func EVMSetupRepeatShortGlitchListener() -> Void {
 	if this._timeSystemCallbackID == 0 {
     let evt: ref<EVMRepeatShortGlitchEvent> = new EVMRepeatShortGlitchEvent();
-    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, 10); // days, hours, opt minutes, opt seconds
+    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, 15); // days, hours, opt minutes, opt seconds
     // Make the numbers bigger since game time is faster than real time. Might also be able to replace with real time in the future.
     // If I'm understanding this correctly, this is dirty coding. The event gets called every 10 game-seconds. Since EVMResetShortGlitchCycle uses a random delay, StartShortGlitch will not occur in-game because another short glitch is already occuring. So it seems more random than it is since some short glitches are skipped. Or it could be that this event waits until RepeatDelayedShortGlitch is finished. Who knows.
 		this._timeSystemCallbackID = Cast<Int32>(GameInstance.GetTimeSystem(this.GetDevicePS().GetGameInstance()).RegisterDelayedListener(this, evt, delay, -1));
     // RegisterDelayedListener(entity:weak<Entity>, eventToDelay:Event, delay:GameTime, repeat:Int32, opt sendOldNoifications:Bool) -> Uint32;
     // argument repeat:Int32 repeats that many times (10 times if set to 10) or infinitely if it's set to -1.
-		this.EVMResetShortGlitchCycle();
 	};
 }
 
 @addMethod(DropPoint)
-protected func EVMResetShortGlitchCycle() -> Void {
+protected cb func OnEVMRepeatShortGlitchEvent(evt:ref<EVMRepeatShortGlitchEvent>) {
   let delaySystem: ref<DelaySystem> = GameInstance.GetDelaySystem(this.GetGame());
   let callback: ref<RepeatDelayedShortGlitch> = new RepeatDelayedShortGlitch();
   callback.dropPoint = this;
