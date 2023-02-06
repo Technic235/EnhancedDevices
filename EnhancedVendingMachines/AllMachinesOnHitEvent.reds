@@ -112,7 +112,7 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.scrip
   };
 
   if !Equals(this.m_controllerTypeName, n"IceMachineController")
-  || Equals(settings.onHitIceMachines, true) {
+  || Equals(settings.onHitIceMachine, true) {
     let instigator = hit.attackData.GetInstigator();
     let player = GetPlayer(this.GetGame());
     if Equals(player.GetEntityID(), instigator.GetEntityID()) {
@@ -488,7 +488,7 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
   if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
   || !Equals(devicePS.evmMalfunctionName, "broken") {
     let settings = new EVMMenuSettings();
-    if Equals(settings.onHitDropPoints, false) {
+    if Equals(settings.onHitDropPoint, false) {
       wrappedMethod(hit); // default behavior
     } else {
       if devicePS.evmHacksRemaining > 0
@@ -512,7 +512,7 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
   if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
   || !Equals(devicePS.evmMalfunctionName, "broken") {
     let settings = new EVMMenuSettings();
-    if Equals(settings.onHitConfessionBooths, false) {
+    if Equals(settings.onHitConfessionBooth, false) {
       wrappedMethod(hit); // default behavior
     } else {
       if devicePS.evmHacksRemaining > 0

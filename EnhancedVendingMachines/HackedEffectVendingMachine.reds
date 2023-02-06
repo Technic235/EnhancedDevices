@@ -29,7 +29,7 @@ protected func HackedEffect() -> Void {
     this.DelayVendingMachineEvent(0, true, true); // dispense the first item
     this.EVMDispenseItems(settings, itemDropOddsArray); // check the rest of the items
     // no need for PlayItemFall() or RefreshUI() since they're already invoked by...
-    // DelayVendingMachineEvent() > VendingMachineFinishedEvent()
+    // DelayVendingMachineEvent() -> VendingMachineFinishedEvent()
   } else { // if no items drop
     if eddiesOddsCheck >= settings.eddiesDropOdds { // if no eddies drop
       if RandRange(0, 100) < itemDropOddsArray[0] { // check if junk will drop
@@ -64,7 +64,7 @@ protected func HackedEffect() -> Void {
     return;
   };
   let settings = new EVMMenuSettings();
-  if Equals(settings.eddiesFromIceMachines, true) {
+  if Equals(settings.eddiesFromIceMachine, true) {
     let eddiesOddsCheck = RandRange(0, 100);
     if eddiesOddsCheck >= settings.eddiesDropOdds { // if no eddies drop
       if RandRange(0, 100) < settings.junkDispenseOdds { // check if junk will drop

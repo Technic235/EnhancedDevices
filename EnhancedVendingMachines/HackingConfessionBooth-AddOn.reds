@@ -3,7 +3,7 @@ module ConfessionBoothHacking
 @wrapMethod(ConfessionBoothControllerPS) // <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <-
 protected final func GetQuickHackActions(out actions:array<ref<DeviceAction>>, context:GetActionsContext) {
   let settings = new EVMMenuSettings();
-  if settings.hackConfessionBooths {
+  if settings.hackConfessionBooth {
     let currentAction:ref<ScriptableDeviceAction>;
     currentAction = this.ActionGlitchScreen(t"DeviceAction.GlitchScreenSuicide", t"QuickHack.SuicideHackBase");
     currentAction.SetDurationValue(this.GetDistractionDuration(currentAction));
@@ -39,7 +39,7 @@ protected cb func OnQuickHackDistraction(evt:ref<QuickHackDistraction>) { // CAL
     this.StartDistraction(true); // from BasicDistractionDevice
     let settings = new EVMMenuSettings();
     if Equals(this.m_controllerTypeName, n"ConfessionBoothController")
-    && settings.hackConfessionBooths { this.EVMMoneyFromHacking(); };
+    && settings.hackConfessionBooth { this.EVMMoneyFromHacking(); };
   };
 
   if evt.IsCompleted() {

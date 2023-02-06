@@ -6,16 +6,7 @@ module DropPointMalfunctions
 @wrapMethod(DropPoint) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
-  let devicePS = this.GetDevicePS();
-  devicePS.SetDeviceState(EDeviceStatus.ON);
-  this.m_uiComponent.Toggle(true); // THIS FIXES A BUG WHERE THE HACKING COUNTDOWN DURATION WONT SHOW IF DROPPOINT IS NEAR AFTER LOADING A SAVE FILE
-  if !Equals(devicePS.evmMalfunctionName, "glitch") {
-    devicePS.evmMalfunctionName = "";
-  } else { // keeps the short glitch malfunction if it already had one
-    devicePS.evmHacksRemaining = 1; // this must go before StartGlitching to prevent items from dispensing
-    this.EVMSetupShortGlitchListener();
-    return;
-  };
+  this.RestartDevice();
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.dropPointMalfunctionRate;
   if malfunctionRate == 0 { return; };

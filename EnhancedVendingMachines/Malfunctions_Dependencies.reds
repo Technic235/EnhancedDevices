@@ -1,9 +1,24 @@
-// <- InteractiveDevice <- (skips) <- Device <-
+// <- InteractiveDevice <- (skips) <- Device <- DeviceBase <-
 // <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
+@addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
+protected func RestartDevice() {
+  let devicePS = this.GetDevicePS();
+  devicePS.EVMUnregisterHoloFlicker();
+  devicePS.SetDeviceState(EDeviceStatus.ON);
+  this.m_uiComponent.Toggle(true);
+  if !Equals(devicePS.evmMalfunctionName, "glitch") {
+    devicePS.evmMalfunctionName = "";
+  } else { // keeps the short glitch malfunction if it already had one
+    devicePS.evmHacksRemaining = 1; // this must go before StartGlitching to prevent items from dispensing
+    this.EVMSetupShortGlitchListener();
+    return;
+  };
+}
+
 // called by DropPoint/VendingMachine/ArcadeMachine-ResolveGameplayState() in Malfunctions
-@addMethod(InteractiveDevice) // <- Device <- DeviceBase <-
+@addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
 protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) -> Void {
   let devicePS = this.GetDevicePS();
   let randomNum = RandRangeF(0, 1);
@@ -28,7 +43,7 @@ protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, broke
   };
 }
 
-@addMethod(InteractiveDevice) // <- Device <- DeviceBase <-
+@addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
 protected func EVMSetupShortGlitchListener() -> Void {
   let devicePS = this.GetDevicePS();
 	if devicePS.evmShortGlitchCallbackID == 0u { // 0u turns zero into a Uint32 instead of Int32
@@ -68,6 +83,10 @@ protected class EVMShortGlitchCallback extends DelayCallback {
       };
       if Equals(this.machine.m_controllerTypeName, n"ConfessionBoothController") {
         (this.machine as ConfessionBooth).StartShortGlitch(); // defined on ConfessionBooth
+      };
+      if Equals(this.machine.m_controllerTypeName, n"DataTermController") {
+        (this.machine as DataTerm).StartShortGlitch(); // defined on DataTerm
+        // StartHoloFlicker() added to StartShortGlitch()
       };
     };
   }

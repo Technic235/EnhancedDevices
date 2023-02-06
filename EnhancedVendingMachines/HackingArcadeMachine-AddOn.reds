@@ -9,7 +9,7 @@ protected cb func OnQuickHackDistraction(evt:ref<QuickHackDistraction>) { // CAL
 		this.ShowQuickHackDuration(evt); // from Device
 		this.StartGlitching(EGlitchState.DEFAULT, 1.0); // from Device
     let settings = new EVMMenuSettings();
-    if settings.hackArcadeMachines { this.EVMMoneyFromHacking(); };
+    if settings.hackArcadeMachine { this.EVMMoneyFromHacking(); };
   };
 
   if evt.IsCompleted() {
@@ -22,6 +22,6 @@ protected cb func OnQuickHackDistraction(evt:ref<QuickHackDistraction>) { // CAL
   wrappedMethod(evt); // PachinkoMachine's OnQuickHackDistraction invokes Device's OnQuickHackDistraction
   if evt.IsStarted() {
     let settings = new EVMMenuSettings();
-    if settings.hackArcadeMachines { this.EVMMoneyFromHacking(); };
+    if settings.hackArcadeMachine { this.EVMMoneyFromHacking(); };
   };
 }

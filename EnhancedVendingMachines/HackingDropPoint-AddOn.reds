@@ -12,7 +12,7 @@ protected cb func OnQuickHackDistraction(evt:ref<QuickHackDistraction>) { // CAL
 		this.StartGlitching(EGlitchState.DEFAULT, 1.0); // from Device
     this.StartDistraction(true); // from BasicDistractionDevice
     let settings = new EVMMenuSettings();
-    if Equals(settings.hackDropPoints, true) { this.EVMMoneyFromHacking(); };
+    if Equals(settings.hackDropPoint, true) { this.EVMMoneyFromHacking(); };
   };
 
   if evt.IsCompleted() {

@@ -17,7 +17,7 @@ protected func GetQuickHackActions(out actions:array<ref<DeviceAction>>, context
   if Equals(this.m_distractorType, EPlaystyleType.TECHIE) || Equals(this.m_distractorType, EPlaystyleType.NONE) { return; };
   let settings = new EVMMenuSettings();
   if Equals((this.GetOwnerEntityWeak() as ExplosiveDevice).m_controllerTypeName, n"ExplosiveDeviceController")
-  && settings.hackExplosiveDevices {
+  && settings.hackExplosiveDevice {
     let currentAction: ref<ScriptableDeviceAction>;
     currentAction = this.ActionQuickHackDistraction();
     currentAction.SetObjectActionID(t"DeviceAction.MalfunctionClassHack");
@@ -64,7 +64,7 @@ protected cb func OnQuickHackDistraction(evt:ref<QuickHackDistraction>) { // CAL
     this.StartDistraction(true); // from BasicDistractionDevice
     let settings = new EVMMenuSettings();
     if Equals(this.m_controllerTypeName, n"ExplosiveDeviceController")
-    && settings.hackExplosiveDevices { this.EVMMoneyFromHacking(); };
+    && settings.hackExplosiveDevice { this.EVMMoneyFromHacking(); };
     let devicePS = this.GetDevicePS();
     if devicePS.evmHacksRemaining <= 0 {
       // devicePS.EVMUnregisterShortGlitchMalfunction(); // FuelDispensers don't have malfunctions until I can find a VFX
