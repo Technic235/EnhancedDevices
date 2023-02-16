@@ -1,4 +1,7 @@
-module TravelTerminalMalfunctions
+module EnhancedDevices.Malfunctions.TravelTerminal
+import EnhancedDevices.Malfunctions.*
+import EnhancedDevices.Settings.*
+
 // DataTerm <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
 // DataTermController <- (skips BasicDistractionDevice) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // DataTermControllerPS <- (skips BasicDistractionDevice) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -7,6 +10,7 @@ module TravelTerminalMalfunctions
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
+  this.machineType = n"DataTermController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.travelTerminalMalfunctionRate;
   if malfunctionRate == 0 { return; };
@@ -18,7 +22,7 @@ protected final func ResolveGameplayState() -> Void {
   this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
-// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions_Dependencies.reds
+// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
 @addMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
@@ -30,26 +34,7 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
   };
 }
 
-// EVMShortGlitchCallback in Malfunctions_Dependencies.reds
-
-// provides some basic functionality when OnHit isnt installed.
-@if(!ModuleExists("TravelTerminalOnHit"))
-@wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
-  let devicePS = this.GetDevicePS();
-  if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
-  || Equals(devicePS.evmMalfunctionName, "broken") {
-    this.StartHoloFlicker();
-    return;
-  };
-
-  if Equals(devicePS.evmMalfunctionName, "static") {
-    this.StartHoloFlicker();
-    super.OnHitEvent(hit);
-  } else {
-    wrappedMethod(hit);
-  };
-}
+// EVMShortGlitchCallback in Malfunctions
 
 @wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
@@ -65,4 +50,23 @@ protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
 @wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func StopGlitching() {
   if this.GetDevicePS().evmHacksRemaining > 0 { wrappedMethod(); };
+}
+
+// provides some basic functionality when OnHit isnt installed.
+@if(!ModuleExists("EnhancedDevices.OnHit.TravelTerminal"))
+@wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
+protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
+  let devicePS = this.GetDevicePS();
+  if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
+  || Equals(devicePS.evmMalfunctionName, "broken") {
+    this.StartHoloFlicker();
+    return;
+  };
+
+  if Equals(devicePS.evmMalfunctionName, "static") {
+    this.StartHoloFlicker();
+    super.OnHitEvent(hit);
+  } else {
+    wrappedMethod(hit);
+  };
 }

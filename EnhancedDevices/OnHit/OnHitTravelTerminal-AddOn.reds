@@ -1,6 +1,10 @@
-module TravelTerminalOnHit
+module EnhancedDevices.OnHit.TravelTerminal
+import EnhancedDevices.Settings.*
 
-// this is used for DataTerm (Fast Travel Terminal) only
+// DataTerm <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
+// DataTermController <- (skips BasicDistractionDevice) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
+// DataTermControllerPS <- (skips BasicDistractionDevice) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
+
 @wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
   let devicePS = this.GetDevicePS();
@@ -13,7 +17,7 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
       wrappedMethod(hit); // default behavior
     } else {
       if devicePS.evmHacksRemaining > 0
-      || !devicePS.moduleExistsTravelTerminalMalfunctions {
+      || !devicePS.moduleExistsMalfunctionsTravelTerminal {
         wrappedMethod(hit); // default behavior
       } else { // still can trigger security but doesn't cancel glitching
         super.OnHitEvent(hit);
@@ -35,13 +39,13 @@ protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
   };
 }
 
-// basically a copy of EVMSetupShortGlitchListener() on InteractiveDevice in Malfunctions_Dependencies.reds
+// basically a copy of EVMSetupShortGlitchListener() on InteractiveDevice in Malfunctions
 @addMethod(InteractiveDevice) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func EVMSetupHoloFlickerListener() -> Void {
   let devicePS = this.GetDevicePS();
 	if devicePS.evmHoloFlickerCallbackID == 0u { // 0u turns zero into a Uint32 instead of Int32
     let evt = new EVMHoloFlickerEvent();
-    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, 5); // days, hours, opt minutes, opt seconds
+    let delay: GameTime = GameTime.MakeGameTime(0, 0, 0, 6); // days, hours, opt minutes, opt seconds
 		devicePS.evmHoloFlickerCallbackID = GameInstance.GetTimeSystem(devicePS.GetGameInstance()).RegisterDelayedListener(this, evt, delay, -1);
     // argument repeat:Int32 repeats that many times (10 times if set to 10) or infinitely if it's set to -1.
 	};

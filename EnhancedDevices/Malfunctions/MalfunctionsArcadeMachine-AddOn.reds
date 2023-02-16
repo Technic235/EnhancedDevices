@@ -1,4 +1,9 @@
-module ArcadeMachineMalfunctions
+module EnhancedDevices.Malfunctions.ArcadeMachine
+import EnhancedDevices.ArcadeMachine.*
+import EnhancedDevices.Malfunctions.*
+import EnhancedDevices.Settings.*
+import EnhancedDevices.*
+
 // PachinkoMachine <- ArcadeMachine <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
 // PachinkoMachineController <- ArcadeMachineController <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // PachinkoMachineControllerPS <- ArcadeMachineControllerPS <- (BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -7,6 +12,7 @@ module ArcadeMachineMalfunctions
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
+  this.machineType = n"ArcadeMachineController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.arcadeMachineMalfunctionRate;
   if malfunctionRate == 0 { return; };
@@ -18,11 +24,11 @@ protected final func ResolveGameplayState() -> Void {
   this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
-// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions_Dependencies.reds
+// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions.reds
 
 // gives machines a repeating short glitch effect, which all machines can acquire
 @addMethod(ArcadeMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
+protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) -> Void {
   if this.GetDevicePS().m_distractionTimeCompleted {
     let delaySystem = GameInstance.GetDelaySystem(this.GetGame());
     let callback = new EVMShortGlitchCallback();
@@ -31,9 +37,9 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
   };
 }
 
-// EVMShortGlitchCallback in Malfunctions_Dependencies.reds
+// EVMShortGlitchCallback in Malfunctions
 
-// EVMSetupArcadeStaticGlitchListener() & EVMArcadeStaticGlitchEvent in DependenciesShared.reds
+// EVMSetupArcadeStaticGlitchListener() & EVMArcadeStaticGlitchEvent in 
 
 // prevents arcade machines from sparking before the current spark FX loop is finished
 @addMethod(ArcadeMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
@@ -51,7 +57,7 @@ class EVMDelayArcadeStaticGlitchCallback extends DelayCallback {
   }
 }
 
-// Bool evmSparkActive, EVMStartArcadeStaticGlitch(), & EVMArcadeStaticGlitchCompletedCallback in Shared Dependencies
+// Bool evmSparkActive, EVMStartArcadeStaticGlitch(), & EVMArcadeStaticGlitchCompletedCallback in ArcadeMachine.reds
 
 @wrapMethod(ArcadeMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) { // works on PachinkoMachine also?

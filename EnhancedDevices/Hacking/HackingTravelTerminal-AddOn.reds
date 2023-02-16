@@ -1,4 +1,10 @@
-module TravelTerminalHacking
+module EnhancedDevices.Hacking.TravelTerminal
+import EnhancedDevices.Settings.*
+
+// DataTerm <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
+// DataTermController <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
+// DataTermControllerPS <- (BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
+
 // scanning_device_gameplay_roles.tweak
 // scanner_chunks.script
 
@@ -18,19 +24,6 @@ protected cb func OnQuickHackDataChanged(value:Variant) {
 @addMethod(DataTermControllerPS)
 protected func CanCreateAnyQuickHackActions() -> Bool {
 	return true;
-}
-
-@addMethod(DataTermControllerPS) // <- (skips BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <-
-protected func ActionQuickHackDistraction() -> ref<QuickHackDistraction> {
-	let action = new QuickHackDistraction();
-	action.SetUp(this);
-	action.SetProperties();
-	action.AddDeviceName(this.m_deviceName);
-	action.SetObjectActionID(t"DeviceAction.MalfunctionClassHack");
-  // action.SetDurationValue(this.GetDistractionDuration(action));
-	action.SetDurationValue(10); // manually set duration
-	// action.CreateInteraction();
-	return action;
 }
 
 // wrapping the cb func was causing irreparable issues

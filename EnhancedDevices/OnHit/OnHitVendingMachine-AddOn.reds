@@ -1,8 +1,12 @@
-module AllMachinesOnHitEvent
-// <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
-// <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
-// <- (skips BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
-// DropPoint(Controller)(PS) <- BasicDistractionDevice(Controller)(PS) <-
+module EnhancedDevices.OnHit.VendingMachine
+import EnhancedDevices.VendingMachine.*
+import EnhancedDevices.Settings.*
+import EnhancedDevices.*
+
+// <- VendingMachine <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
+// <- VendingMachineController <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
+// <- VendingMachineControllerPS <- (skips BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
+// IceMachine(Controller)(PS)/WeaponMachine(Controller)(PS) <- VendingMachine(Controller)(PS) <-
 
 // baseDeviceActions.script for powering, activating, turning on/off devices
 
@@ -95,8 +99,8 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.scrip
   let settings = new EVMMenuSettings();
 
   if devicePS.m_distractionTimeCompleted {
-    if ( devicePS.moduleExistsVendingMachineMalfunctions && !Equals(devicePS.evmMalfunctionName, "static") )
-    || !devicePS.moduleExistsVendingMachineMalfunctions {
+    if ( devicePS.moduleExistsMalfunctionsVendingMachine && !Equals(devicePS.evmMalfunctionName, "static") )
+    || !devicePS.moduleExistsMalfunctionsVendingMachine {
       this.StartShortGlitch();
     };
   };
@@ -460,70 +464,6 @@ protected class EVMStopBlackGlitchCallback extends DelayCallback {
           devicePS.m_isReady = true;
         };
         this.machine.RefreshUI();
-      };
-    };
-  };
-}
-
-// this is used for PachinkoMachine & ArcadeMachine
-@wrapMethod(ArcadeMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // also affects PachinkoMachine
-  let devicePS = this.GetDevicePS();
-  if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
-  || !Equals(devicePS.evmMalfunctionName, "broken") {
-    wrappedMethod(hit); // conditional checks have been built into StartGlitching() for Arcade/PachinkoMachine
-    let settings = new EVMMenuSettings();
-    if Equals(this.GetDeviceState(), EDeviceStatus.ON)
-    && RandRange(0, 100) < settings.onHitBreakOdds {
-      this.TurnOffDevice();
-      this.EVMShutDownMachine();
-    };
-  };
-}
-
-// this is used for DropPoint only
-@wrapMethod(DropPoint) // <- BasicDistractionDevice <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
-  let devicePS = this.GetDevicePS();
-  if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
-  || !Equals(devicePS.evmMalfunctionName, "broken") {
-    let settings = new EVMMenuSettings();
-    if Equals(settings.onHitDropPoint, false) {
-      wrappedMethod(hit); // default behavior
-    } else {
-      if devicePS.evmHacksRemaining > 0
-      || !devicePS.moduleExistsDropPointMalfunctions {
-        wrappedMethod(hit); // default behavior
-      } else { // still can trigger security but doesn't cancel glitching
-        super.OnHitEvent(hit);
-      };
-      if Equals(this.GetDeviceState(), EDeviceStatus.ON)
-      && RandRange(0, 100) < settings.onHitBreakOdds {
-        this.EVMShutDownMachine();
-      };
-    };
-  };
-}
-
-// this is used for ConfessionBooth only
-@wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
-  let devicePS = this.GetDevicePS();
-  if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
-  || !Equals(devicePS.evmMalfunctionName, "broken") {
-    let settings = new EVMMenuSettings();
-    if Equals(settings.onHitConfessionBooth, false) {
-      wrappedMethod(hit); // default behavior
-    } else {
-      if devicePS.evmHacksRemaining > 0
-      || !devicePS.moduleExistsConfessionBoothMalfunctions {
-        wrappedMethod(hit); // default behavior
-      } else { // still can trigger security but doesn't cancel glitching
-        super.OnHitEvent(hit);
-      };
-      if Equals(this.GetDeviceState(), EDeviceStatus.ON)
-      && RandRange(0, 100) < settings.onHitBreakOdds {
-        this.EVMShutDownMachine();
       };
     };
   };

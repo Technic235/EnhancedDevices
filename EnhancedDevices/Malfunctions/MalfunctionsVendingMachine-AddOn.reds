@@ -1,4 +1,7 @@
-module VendingMachineMalfunctions
+module EnhancedDevices.Malfunctions.VendingMachine
+import EnhancedDevices.Malfunctions.*
+import EnhancedDevices.Settings.*
+
 // <- VendingMachine <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
 // <- VendingMachineController <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // <- VendingMachineControllerPS <- (skips BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -8,6 +11,7 @@ module VendingMachineMalfunctions
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
+  this.machineType = n"VendingMachineController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.vendingMachineMalfunctionRate;
   if malfunctionRate == 0 { return; };
@@ -19,7 +23,7 @@ protected final func ResolveGameplayState() -> Void {
   this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
-// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions_Dependencies.reds
+// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
 @addMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
@@ -31,38 +35,35 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
   };
 }
 
-// EVMShortGlitchCallback in Malfunctions_Dependencies.reds
-
-// provides some basic functionality when OnHit isnt installed.
-@wrapMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
-  let devicePS = this.GetDevicePS();
-  if !devicePS.moduleExistsAllMachinesOnHitEvent {
-    if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
-    || Equals(devicePS.evmMalfunctionName, "broken") {
-      return;
-    };
-
-    if Equals(devicePS.evmMalfunctionName, "static") {
-      super.OnHitEvent(hit);
-    } else {
-      wrappedMethod(hit);
-    };
-  } else {
-    wrappedMethod(hit);
-  };
-}
+// EVMShortGlitchCallback in Malfunctions
 
 // provides basic functionality when HackedEffect isn't installed
 @wrapMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func HackedEffect() { // invoked by StartGlitching
   // stop script if vending machine is sold out.
   let devicePS = this.GetDevicePS();
-  if Equals(devicePS.evmMalfunctionName, "static") && !devicePS.moduleExistsVendingMachineHackedEffect {
+  if Equals(devicePS.evmMalfunctionName, "static") && !devicePS.moduleExistsHackingVendingMachine {
     if devicePS.IsSoldOut() {
       this.SendSoldOutToUIBlackboard(true);
     };
   } else {
     wrappedMethod();
+  };
+}
+
+// provides some basic functionality when OnHit isnt installed.
+@if(!ModuleExists("EnhancedDevices.OnHit.VendingMachine"))
+@wrapMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
+protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
+  let devicePS = this.GetDevicePS();
+  if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
+  || Equals(devicePS.evmMalfunctionName, "broken") {
+    return;
+  };
+
+  if Equals(devicePS.evmMalfunctionName, "static") {
+    super.OnHitEvent(hit);
+  } else {
+    wrappedMethod(hit);
   };
 }

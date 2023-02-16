@@ -1,4 +1,7 @@
-module ConfessionBoothMalfunctions
+module EnhancedDevices.Malfunctions.ConfessionBooth
+import EnhancedDevices.Malfunctions.*
+import EnhancedDevices.Settings.*
+
 // ConfessionBooth <- BasicDistractionDevice <- InteractiveDevice <- (skips) <- Device <-
 // ConfessionBoothController <- BasicDistractionDeviceController <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // ConfessionBoothControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -7,6 +10,7 @@ module ConfessionBoothMalfunctions
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
+  this.machineType = n"ConfessionBoothController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.confessionBoothMalfunctionRate;
   if malfunctionRate == 0 { return; };
@@ -18,7 +22,7 @@ protected final func ResolveGameplayState() -> Void {
   this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
-// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions_Dependencies.reds
+// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
 @addMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
@@ -30,27 +34,7 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
   };
 }
 
-// EVMShortGlitchCallback in Malfunctions_Dependencies.reds
-
-// provides some basic functionality when OnHit isnt installed.
-@wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
-  let devicePS = this.GetDevicePS();
-  if !devicePS.moduleExistsAllMachinesOnHitEvent {
-    if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
-    || Equals(devicePS.evmMalfunctionName, "broken") {
-      return;
-    };
-
-    if Equals(devicePS.evmMalfunctionName, "static") {
-      super.OnHitEvent(hit);
-    } else {
-      wrappedMethod(hit);
-    };
-  } else {
-    wrappedMethod(hit);
-  };
-}
+// EVMShortGlitchCallback in Malfunctions
 
 @wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
@@ -66,4 +50,21 @@ protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
 @wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected func StopGlitching() {
   if this.GetDevicePS().evmHacksRemaining > 0 { wrappedMethod(); };
+}
+
+// provides some basic functionality when OnHit isnt installed.
+@if(!ModuleExists("EnhancedDevices.OnHit.ConfessionBooth"))
+@wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
+protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
+  let devicePS = this.GetDevicePS();
+  if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
+  || Equals(devicePS.evmMalfunctionName, "broken") {
+    return;
+  };
+
+  if Equals(devicePS.evmMalfunctionName, "static") {
+    super.OnHitEvent(hit);
+  } else {
+    wrappedMethod(hit);
+  };
 }

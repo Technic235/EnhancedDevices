@@ -1,4 +1,5 @@
-// import EnhancedVendingMachines.ModuleConfig.*
+module EnhancedDevices.HideSettings
+import EnhancedDevices.Settings.*
 
 @addField(SettingsMainGameController)
 let modReference: SettingsCategory;
@@ -7,18 +8,6 @@ let modReference: SettingsCategory;
 let categoryReference: SettingsCategory;
 
 // shared dependencies absolutely required
-// VendingMachineHackedEffect doesn't require anything else
-// // // ArcadeMachineHacking requires VendingMachineHackedEffect
-// // // DropPointHacking requires VendingMachineHackedEffect
-// // // FuelDispenserHacking requires VendingMachineHackedEffect
-// // // ConfessionBoothHacking requires VendingMachineHackedEffect
-// AllMachinesOnHitEvent doesn't require anything else
-// MalfunctionsDependencies requires shared dependencies
-// VendingMachineMalfunctions requires malfunction dependencies
-// ArcadeMachineMalfunctions requires malfunction dependencies
-// DropPointMalfunctions requires malfunction dependencies
-// ConfessionBoothMalfunctions requires malfunction dependencies
-// TravelTerminalMalfunctions requires malfunction dependencies
 
 // This is for uncategorized settings, but I don't have any
 // @wrapMethod(SettingsMainGameController)
@@ -41,8 +30,8 @@ let categoryReference: SettingsCategory;
 //   return wrappedMethod();
 // }
 
-// VendingMachineHackedEffect doesn't require anything else
-@if(ModuleExists("VendingMachineHackedEffect"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Hacking.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -106,8 +95,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// VendingMachineHackedEffect doesn't require anything else
-@if(!ModuleExists("VendingMachineHackedEffect"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Hacking.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -143,9 +132,9 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// // // ArcadeMachineHacking requires VendingMachineHackedEffect
+// // // requires VendingMachineHackedEffect
 // // // includes Transfer hack arcade/pachinko machines
-@if(!ModuleExists("ArcadeMachineHacking"))
+@if(!ModuleExists("EnhancedDevices.Hacking.ArcadeMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -180,9 +169,9 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// // // DropPointHacking requires VendingMachineHackedEffect
+// // // requires VendingMachineHackedEffect
 // // // Includes Transfer hack drop points
-@if(!ModuleExists("DropPointHacking"))
+@if(!ModuleExists("EnhancedDevices.Hacking.DropPoint"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -218,9 +207,9 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// // // ExplosiveDeviceHacking requires VendingMachineHackedEffect
+// // // requires VendingMachineHackedEffect
 // // // Includes Transfer hack explosive devices
-@if(!ModuleExists("FuelDispenserHacking"))
+@if(!ModuleExists("EnhancedDevices.Hacking.FuelDispenser"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -256,9 +245,9 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// // // ConfessionBoothHacking requires VendingMachineHackedEffect
+// // // requires VendingMachineHackedEffect
 // // // Includes Transfer hack confession booths
-@if(!ModuleExists("ConfessionBoothHacking"))
+@if(!ModuleExists("EnhancedDevices.Hacking.ConfessionBooth"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -294,9 +283,9 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// // // TravelTerminalHacking requires VendingMachineHackedEffect
+// // // requires VendingMachineHackedEffect
 // // // Includes Transfer hack travel terminals
-@if(!ModuleExists("TravelTerminalHacking"))
+@if(!ModuleExists("EnhancedDevices.Hacking.TravelTerminal"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -332,8 +321,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// AllMachinesOnHitEvent doesn't require anything else
-@if(ModuleExists("AllMachinesOnHitEvent"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.OnHit.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -395,8 +384,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// AllMachinesOnHitEvent doesn't require anything else
-@if(!ModuleExists("AllMachinesOnHitEvent"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.OnHit.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -428,8 +417,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// VendingMachineMalfunctions doesn't require anything else
-@if(ModuleExists("VendingMachineMalfunctions"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -463,8 +452,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// VendingMachineMalfunctions doesn't require anything else
-@if(!ModuleExists("VendingMachineMalfunctions"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.VendingMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -496,8 +485,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// ArcadeMachineMalfunctions doesn't require anything else
-@if(ModuleExists("ArcadeMachineMalfunctions"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.ArcadeMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -531,8 +520,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// ArcadeMachineMalfunctions doesn't require anything else
-@if(!ModuleExists("ArcadeMachineMalfunctions"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.ArcadeMachine"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -566,8 +555,8 @@ protected func IsResetButtonEnabled() -> Bool {
 
 
 
-// DropPointMalfunctions doesn't require anything else
-@if(ModuleExists("DropPointMalfunctions"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.DropPoint"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -601,8 +590,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// DropPointMalfunctions doesn't require anything else
-@if(!ModuleExists("DropPointMalfunctions"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.DropPoint"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -634,8 +623,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// ConfessionBoothMalfunctions doesn't require anything else
-@if(ModuleExists("ConfessionBoothMalfunctions"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.ConfessionBooth"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -669,8 +658,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// ConfessionBoothMalfunctions doesn't require anything else
-@if(!ModuleExists("ConfessionBoothMalfunctions"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.ConfessionBooth"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -702,8 +691,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// TravelTerminalMalfunctions doesn't require anything else
-@if(ModuleExists("TravelTerminalMalfunctions"))
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.TravelTerminal"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -737,8 +726,8 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
-// TravelTerminalMalfunctions doesn't require anything else
-@if(!ModuleExists("TravelTerminalMalfunctions"))
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.TravelTerminal"))
 @wrapMethod(SettingsMainGameController)
 protected func IsResetButtonEnabled() -> Bool {
   if !this.modReference.isEmpty {
@@ -770,16 +759,72 @@ protected func IsResetButtonEnabled() -> Bool {
   return wrappedMethod();
 }
 
+// doesn't require anything else
+@if(ModuleExists("EnhancedDevices.Malfunctions.Jukebox"))
+@wrapMethod(SettingsMainGameController)
+protected func IsResetButtonEnabled() -> Bool {
+  if !this.modReference.isEmpty {
+    let mod = this.modReference;
+    if !this.categoryReference.isEmpty {
+      let category = this.categoryReference;
+
+      if Equals(mod.label, n"Enhanced VM$") {
+        let settings = new EVMMenuSettings();
+        if Equals(category.label, n"Starting Malfunctions: Jukeboxes") {
+          if settings.jukeboxMalfunctionRate == 0 {
+            let i = settings.JukeboxMalfunctionsSettingsCount()-1; // returns 4-1 -> returns 3
+            while i > 0 {
+              if IsDefined(category.options[i]) {
+                ArrayErase(category.options, i);
+                i -= 1;
+              } else {
+                break;
+              };
+            };
+          };
+        };
+      };
+
+      ArrayClear(this.categoryReference.options);
+      for option in category.options {
+        ArrayPush(this.categoryReference.options, option);
+      };
+    };
+  };
+  return wrappedMethod();
+}
+
+// doesn't require anything else
+@if(!ModuleExists("EnhancedDevices.Malfunctions.Jukebox"))
+@wrapMethod(SettingsMainGameController)
+protected func IsResetButtonEnabled() -> Bool {
+  if !this.modReference.isEmpty {
+    let mod = this.modReference;
+    if !this.categoryReference.isEmpty {
+      let category = this.categoryReference;
+
+      if Equals(mod.label, n"Enhanced VM$") {
+        let settings = new EVMMenuSettings();
+        if Equals(category.label, n"Starting Malfunctions: Jukeboxes") {
+          let i = 0;
+          while i < settings.JukeboxMalfunctionsSettingsCount() {
+            if IsDefined(category.options[0]) {
+              ArrayErase(category.options, 0);
+              i += 1;
+            } else {
+              break;
+            };
+          };
+        };
+      };
+
+      ArrayClear(this.categoryReference.options);
+      for option in category.options {
+        ArrayPush(this.categoryReference.options, option);
+      };
+    };
+  };
+  return wrappedMethod();
+}
+
 // shared dependencies absolutely required
-// VendingMachineHackedEffect doesn't require anything else
-// // // ArcadeMachineHacking requires VendingMachineHackedEffect
-// // // DropPointHacking requires VendingMachineHackedEffect
-// // // FuelDispenserHacking requires VendingMachineHackedEffect
-// // // ConfessionBoothHacking requires VendingMachineHackedEffect
-// AllMachinesOnHitEvent doesn't require anything else
-// MalfunctionsDependencies requires shared dependencies
-// VendingMachineMalfunctions requires malfunction dependencies
-// ArcadeMachineMalfunctions requires malfunction dependencies
-// DropPointMalfunctions requires malfunction dependencies
-// ConfessionBoothMalfunctions requires malfunction dependencies
-// TravelTerminalMalfunctions requires malfunction dependencies

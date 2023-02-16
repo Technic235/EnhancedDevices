@@ -1,4 +1,8 @@
-module VendingMachineHackedEffect
+module EnhancedDevices.Hacking.VendingMachine
+import EnhancedDevices.VendingMachine.*
+import EnhancedDevices.Settings.*
+import EnhancedDevices.*
+
 // <- VendingMachine <- (skips BasicDistractionDevice) <- InteractiveDevice <- (skips) <- Device <-
 // <- VendingMachineController <- (skips BasicDistractionDeviceController) <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // <- VendingMachineControllerPS <- (skips BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -9,6 +13,7 @@ module VendingMachineHackedEffect
 // protected function CacheDeviceState( state : EDeviceStatus ) {...}
 // protected virtual function SetDeviceState( state : EDeviceStatus ) {...}
 // public virtual function EvaluateDeviceState() {...}
+
 @replaceMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func HackedEffect() -> Void {
   // stop script if vending machine is sold out.
@@ -71,9 +76,7 @@ protected func HackedEffect() -> Void {
         wrappedMethod(); // drop junk
       };
     } else { // if eddies probability check passes
-      // if devicePS.moduleExistsArcadeMachineHacking {
-        this.EVMDispenseEddies(eddiesOddsCheck); // drop eddies
-      // };
+      this.EVMDispenseEddies(eddiesOddsCheck); // drop eddies
     };
   } else {
     wrappedMethod();

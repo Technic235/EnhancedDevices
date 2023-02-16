@@ -1,4 +1,7 @@
-module DropPointMalfunctions
+module EnhancedDevices.Malfunctions.DropPoint
+import EnhancedDevices.Malfunctions.*
+import EnhancedDevices.Settings.*
+
 // DropPoint <- BasicDistractionDevice <- InteractiveDevice <- (skips) <- Device <-
 // DropPointController <- BasicDistractionDeviceController <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // DropPointControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -7,6 +10,7 @@ module DropPointMalfunctions
 protected final func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
+  this.machineType = n"DropPointController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.dropPointMalfunctionRate;
   if malfunctionRate == 0 { return; };
@@ -18,7 +22,7 @@ protected final func ResolveGameplayState() -> Void {
   this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
-// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions_Dependencies.reds
+// EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
 @addMethod(DropPoint) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
@@ -30,7 +34,7 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
   };
 }
 
-// EVMShortGlitchCallback in Malfunctions_Dependencies.reds
+// EVMShortGlitchCallback in Malfunctions
 
 @wrapMethod(DropPoint) // <- BasicDistractionDevice <- InteractiveDevice <-
 protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {

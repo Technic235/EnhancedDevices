@@ -1,7 +1,8 @@
-module DropPointHacking
-// DropPoint <- BasicDistractionDevice <- InteractiveDevice
-// DropPointController <- ScriptableDeviceComponent <- DeviceComponent
-// DropPointControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS
+module EnhancedDevices.Hacking.DropPoint
+import EnhancedDevices.Settings.*
+// DropPoint <- BasicDistractionDevice <- InteractiveDevice <- (skips) <- Device <-
+// DropPointController <- BasicDistractionDeviceController <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
+// DropPointControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 // by having one cb func on BasicDistractionDevice and another on class Device, it was subtracting 2 hacks each time instead of just one.
 // wrapping the cb func was causing irreparable issues

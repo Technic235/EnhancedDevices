@@ -1,3 +1,5 @@
+module EnhancedDevices.Settings
+
 public class EVMMenuSettings {
   @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 3
   @runtimeProperty("ModSettings.category", "")
@@ -5,7 +7,7 @@ public class EVMMenuSettings {
   @runtimeProperty("ModSettings.description", "OFF: vending/ice machines & slaught-o-matics no longer make an obnoxious announcement when hacked. Machines with the static starting malfunction have been made silent by default. ON: they will continue to scream at you.")
   let announcementsOn: Bool = false;
   
-  // Items Hack Settings
+// Items Hack Settings
   @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Items Hack Settings")
   @runtimeProperty("ModSettings.displayName", "Max possible items")
@@ -140,119 +142,111 @@ public class EVMMenuSettings {
     ];
   }
 
-  // Eddies Hack Settings: 7 total
-  // [0] Eddies drop probability - Slider
-  // [1] Max eddies - Slider
-  // [2] Min eddies - Slider
-  // [3] Eddies always possible - Toggle
-  // [4] Direct Deposit - Toggle
-  // [5] Consolidate eddie bundles - Slider
-  // [6] Ice machines drop eddies - Toggle
+// 
+// 
+// 
 
-  // Eddies Hack Settings
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 0
+// Eddies Hack Settings
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
   @runtimeProperty("ModSettings.displayName", "Eddies drop probability")
   @runtimeProperty("ModSettings.description", "The percentage chance eddies will drop when hacked. The amount is randomly determined by min/max settings.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "90")
   @runtimeProperty("ModSettings.step", "1")
-  let eddiesDropOdds: Int32 = 50;
+  let eddiesDropOdds: Int32 = 90;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 1
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Max eddies") //
+  @runtimeProperty("ModSettings.displayName", "Max eddies")
   @runtimeProperty("ModSettings.description", "The max number of eddies that can drop if the probability check passes. Cannot be lower than the min.")
   @runtimeProperty("ModSettings.min", "1")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   let eddiesMax: Int32 = 25;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 2
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Min eddies") //
+  @runtimeProperty("ModSettings.displayName", "Min eddies")
   @runtimeProperty("ModSettings.description", "The minimum number of eddies that can drop if the probability check passes. If higher than the max, the min will be reduced to one less than the max.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "99")
   @runtimeProperty("ModSettings.step", "1")
   let eddiesMin: Int32 = 1;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 3
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Eddies always possible") //
+  @runtimeProperty("ModSettings.displayName", "Eddies always possible")
   @runtimeProperty("ModSettings.description", "OFF: eddies may only drop if no items are dispensed, assuming the check passes. ON: eddies could potentially drop even when items are dispensed.")
   let eddiesAlways: Bool = false;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 4
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Direct deposit") //
+  @runtimeProperty("ModSettings.displayName", "Direct deposit")
   @runtimeProperty("ModSettings.description", "OFF: eddie bundles dispense out of the vending machine that you have to pick up manually. ON: eddies are deposited directly to you without the need to pick them up.")
   let eddiesDeposit: Bool = false;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 5
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Consolidate eddie bundles") //
+  @runtimeProperty("ModSettings.displayName", "Consolidate eddie bundles")
   @runtimeProperty("ModSettings.description", "When Direct deposit is off, this determines the percentage of eddies that are consolidated into fewer bundles. 100%: all eddies will be in a single bundle. 0%: all eddies will be split into bundles of 1 eddie each.")
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
   let eddiesConsolidated: Int32 = 40;
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 6
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Hack ice machines") //
+  @runtimeProperty("ModSettings.displayName", "Hack ice machines")
   @runtimeProperty("ModSettings.description", "OFF: ice machines keep their default behavior of dispensing ice cubes when hacked. ON: ice machines can also drop eddies when hacked.")
   let eddiesFromIceMachine: Bool = true; // part of ArcadeMachineHacking
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 8
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Transfer hack arcade/pachinko machines") //
+  @runtimeProperty("ModSettings.displayName", "Transfer hack arcade/pachinko machines")
   @runtimeProperty("ModSettings.description", "OFF: both machines keep their default distract behavior when hacked. ON: both machines can transfer eddies to the player via direct deposit.")
   let hackArcadeMachine: Bool = true; // part of ArcadeMachineHacking
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 7
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Transfer hack drop points") //
+  @runtimeProperty("ModSettings.displayName", "Transfer hack drop points")
   @runtimeProperty("ModSettings.description", "OFF: drop points keep their default distract behavior when hacked. ON: drop points can transfer eddies to the player via direct deposit.")
   let hackDropPoint: Bool = true; // part of DropPointHacking
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 8
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Transfer hack fuel dispensers") //
+  @runtimeProperty("ModSettings.displayName", "Transfer hack fuel dispensers")
   @runtimeProperty("ModSettings.description", "OFF: fuel dispensers don't have a distract quickhack. ON: fuel dispensers can distract and transfer eddies to the player via direct deposit.")
   let hackExplosiveDevice: Bool = true; // part of ExplosiveDeviceHacking
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 8
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Transfer hack confession booths") //
+  @runtimeProperty("ModSettings.displayName", "Transfer hack confession booths")
   @runtimeProperty("ModSettings.description", "OFF: confession booths keep their default distract behavior. ON: confession booths can transfer eddies to the player via direct deposit.")
   let hackConfessionBooth: Bool = true; // part of ConfessionBoothHacking
 
-  @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 8
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
-  @runtimeProperty("ModSettings.displayName", "Transfer hack travel terminals") //
+  @runtimeProperty("ModSettings.displayName", "Transfer hack travel terminals")
   @runtimeProperty("ModSettings.description", "OFF: fast travel terminals don't have a distract quickhack. ON: travel terminals can distract and transfer eddies to the player via direct deposit.")
   let hackTravelTerminal: Bool = true; // part of TravelTerminalHacking
 
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "Eddies Hack Settings")
+  @runtimeProperty("ModSettings.displayName", "Transfer hack jukeboxes")
+  @runtimeProperty("ModSettings.description", "OFF: jukeboxes keep their default distract behavior. ON: jukeboxes can transfer eddies to the player via direct deposit.")
+  let hackJukebox: Bool = true; // part of JukeboxHacking
+
   public func EddiesHackSettingsCount() -> Int32 {
-    return 12;
+    return 13;
   }
 
-    // Hooligan Settings: 10 total - [9] isn't done yet
-    // [0] Multiple drops possible - Toggle
-    // [1] Drop behavior when breaking - Enumerator (Nothing when breaking, Sometimes when breaking, Only when breaking)
-    // [2] Break probability - Slider
-    // ... If three sliders below set to 0 then hide [0]-[1] & [6]-[8]
-    // [3] Item probability - Slider
-    // [4] Junk probability - Slider
-    // [5] Eddies probability - Slider
-    // ... If Eddies probability set to 0 then hide [6]-[8]
-    // [6] Eddies Max - Slider
-    // [7] Eddies Min - Slider
-    // [8] Direct Deposit - Toggle
-    // [9] Ice machines drop eddies
+// 
+// 
+// 
 
-  // Inspired by yakuzadeso
+// On-Hit Vandal Settings
+// Inspired by yakuzadeso
   @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 0
   @runtimeProperty("ModSettings.category", "On-Hit Vandal Settings")
   @runtimeProperty("ModSettings.displayName", "Drop behavior when breaking") 
@@ -303,7 +297,7 @@ public class EVMMenuSettings {
   @runtimeProperty("ModSettings.min", "1")
   @runtimeProperty("ModSettings.max", "25")
   @runtimeProperty("ModSettings.step", "1")
-  let onHitEddiesMax: Int32 = 25;
+  let onHitEddiesMax: Int32 = 15;
 
   @runtimeProperty("ModSettings.mod", "Enhanced VM$") // 6
   @runtimeProperty("ModSettings.category", "On-Hit Vandal Settings")
@@ -356,14 +350,21 @@ public class EVMMenuSettings {
   @runtimeProperty("ModSettings.description", "OFF: travel terminals keep their default behavior of doing nothing when hit. ON: travel terminals can break, but are still useable.")
   let onHitTravelTerminal: Bool = true;
 
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "On-Hit Vandal Settings")
+  @runtimeProperty("ModSettings.displayName", "Vandalize jukeboxes")
+  @runtimeProperty("ModSettings.description", "OFF: jukeboxes keep their default behavior of doing nothing when hit. ON: jukeboxes can break.")
+  let onHitJukebox: Bool = true;
+
   public func OnHitSettingsCount() -> Int32 {
-    return 13;
+    return 14;
   }
 
 //
 //
 //
 
+// Starting Malfunctions
   @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Starting Malfunctions: Vending Machines")
   @runtimeProperty("ModSettings.displayName", "Vending machine malfunction rate")
@@ -404,7 +405,6 @@ public class EVMMenuSettings {
     return 4;
   }
 
-//
 //
 //
 
@@ -450,7 +450,6 @@ public class EVMMenuSettings {
 
 //
 //
-//
 
   @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Starting Malfunctions: Drop Points")
@@ -494,7 +493,6 @@ public class EVMMenuSettings {
 
 //
 //
-//
 
   @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Starting Malfunctions: Confession Booths")
@@ -503,7 +501,7 @@ public class EVMMenuSettings {
   @runtimeProperty("ModSettings.min", "0")
   @runtimeProperty("ModSettings.max", "100")
   @runtimeProperty("ModSettings.step", "1")
-  let confessionBoothMalfunctionRate: Int32 = 40;
+  let confessionBoothMalfunctionRate: Int32 = 60;
 
   @runtimeProperty("ModSettings.mod", "Enhanced VM$")
   @runtimeProperty("ModSettings.category", "Starting Malfunctions: Confession Booths")
@@ -536,7 +534,6 @@ public class EVMMenuSettings {
     return 4;
   }
 
-//
 //
 //
 
@@ -577,6 +574,49 @@ public class EVMMenuSettings {
   let travelTerminalBroken: Int32 = 1;
 
   public func TravelTerminalMalfunctionsSettingsCount() -> Int32 {
+    return 4;
+  }
+
+//
+//
+
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "Starting Malfunctions: Jukeboxes")
+  @runtimeProperty("ModSettings.displayName", "Jukebox malfunction rate")
+  @runtimeProperty("ModSettings.description", "The overall % of jukeboxes with a malfunction. 3 types: (continuous) static glitch, (intermittent) short glitch, (completely off) broken. Only set the relative odds sliders of 1 or 2 types to 0 to guarantee those types won't occur.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "100")
+  @runtimeProperty("ModSettings.step", "1")
+  let jukeboxMalfunctionRate: Int32 = 60;
+
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "Starting Malfunctions: Jukeboxes")
+  @runtimeProperty("ModSettings.displayName", "Jukebox glitch relative odds")
+  @runtimeProperty("ModSettings.description", "The odds a jukebox will short-glitch by default. They can be hacked once and also broken by hitting them. The three malfunction types are only considered if malfunction rate is above 0%.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "11")
+  @runtimeProperty("ModSettings.step", "1")
+  let jukeboxGlitch: Int32 = 11;
+
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "Starting Malfunctions: Jukeboxes")
+  @runtimeProperty("ModSettings.displayName", "Jukebox static relative odds")
+  @runtimeProperty("ModSettings.description", "The odds a jukebox will static-glitch by default. They cannot be hacked, but can be broken by hitting them. Set this higher or lower than the other two types to determine how often this malfunction occurs.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "11")
+  @runtimeProperty("ModSettings.step", "1")
+  let jukeboxStatic: Int32 = 6;
+
+  @runtimeProperty("ModSettings.mod", "Enhanced VM$")
+  @runtimeProperty("ModSettings.category", "Starting Malfunctions: Jukeboxes")
+  @runtimeProperty("ModSettings.displayName", "Jukebox broken relative odds")
+  @runtimeProperty("ModSettings.description", "The odds a jukebox will be broken by default. They cannot be hacked. If the relative odds of all three types are equal, they will occur equally.")
+  @runtimeProperty("ModSettings.min", "0")
+  @runtimeProperty("ModSettings.max", "11")
+  @runtimeProperty("ModSettings.step", "1")
+  let jukeboxBroken: Int32 = 1;
+
+  public func JukeboxMalfunctionsSettingsCount() -> Int32 {
     return 4;
   }
 }

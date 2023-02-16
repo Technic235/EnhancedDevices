@@ -1,3 +1,6 @@
+module EnhancedDevices.Malfunctions
+import EnhancedDevices.ArcadeMachine.*
+
 // <- InteractiveDevice <- (skips) <- Device <- DeviceBase <-
 // <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
@@ -17,9 +20,29 @@ protected func RestartDevice() {
   };
 }
 
+@addField(InteractiveDevice)
+let machineType: CName;
+
 // called by DropPoint/VendingMachine/ArcadeMachine-ResolveGameplayState() in Malfunctions
 @addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
-protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) -> Void {
+protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) {
+  if Equals(this.machineType, n"JukeboxController") { // Jukebox.script is on a ton of random devices
+    if Equals(this.m_controllerTypeName, n"JukeboxController") { // but m_controllerTypeName gets overwritten on those devices
+      this.ActivateStartingMalfunction(shortLimit, staticLimit, brokenLimit);
+    } else {
+      this.machineType = n"";
+    };
+  } else {
+    if !Equals(this.machineType, n"") {
+      this.ActivateStartingMalfunction(shortLimit, staticLimit, brokenLimit);
+    };
+  };
+  return;
+}
+
+
+@addMethod(InteractiveDevice)
+protected func ActivateStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) {
   let devicePS = this.GetDevicePS();
   let randomNum = RandRangeF(0, 1);
   if 0.0 < randomNum && randomNum <= shortLimit {
@@ -35,7 +58,15 @@ protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, broke
       devicePS.evmHacksRemaining = 0;
     };
     (this as VendingMachine).LoudVendingMachines(false);
-    this.StartGlitching(EGlitchState.DEFAULT, 1.0); // this invokes HackedEffect
+    if Equals(this.m_controllerTypeName, n"JukeboxController") {
+      let jukebox = this as Jukebox;
+      let SFXcache = jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX;
+      jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX = n"";
+      this.StartGlitching(EGlitchState.DEFAULT, 1.0); // this invokes HackedEffect
+      jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX = SFXcache;
+    } else {
+      this.StartGlitching(EGlitchState.DEFAULT, 1.0); // this invokes HackedEffect
+    };
     return;
   };
   if randomNum <= brokenLimit {
@@ -43,8 +74,18 @@ protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, broke
   };
 }
 
+    // if Equals(this.m_controllerTypeName, n"ArcadeMachineController")
+    // || Equals(this.m_controllerTypeName, n"PachinkoMachineController")
+    // || Equals(this.m_controllerTypeName, n"ConfessionBoothController")
+    // || Equals(this.m_controllerTypeName, n"DropPointController")
+    // || Equals(this.m_controllerTypeName, n"JukeboxController")
+    // || Equals(this.m_controllerTypeName, n"TravelTerminalController")
+    // || Equals(this.m_controllerTypeName, n"VendingMachineController")
+    // || Equals(this.m_controllerTypeName, n"WeaponVendingMachineController")
+    // || Equals(this.m_controllerTypeName, n"IceMachineController") {
+
 @addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
-protected func EVMSetupShortGlitchListener() -> Void {
+protected func EVMSetupShortGlitchListener() {
   let devicePS = this.GetDevicePS();
 	if devicePS.evmShortGlitchCallbackID == 0u { // 0u turns zero into a Uint32 instead of Int32
     devicePS.evmMalfunctionName = "glitch";
@@ -59,34 +100,45 @@ protected func EVMSetupShortGlitchListener() -> Void {
 	};
 }
 
-protected class EVMShortGlitchEvent extends Event {
+public class EVMShortGlitchEvent extends Event {
   // intentionally empty
 }
 
 // OnEVMShortGlitchEvent() in DropPoint/Arcade/VendingMachine Malfunction files
 
-protected class EVMShortGlitchCallback extends DelayCallback {
+public class EVMShortGlitchCallback extends DelayCallback {
   let machine: ref<InteractiveDevice>;
-  protected func Call() -> Void {
+  protected func Call() {
     if this.machine.GetDevicePS().evmHacksRemaining > 0 {
       if Equals(this.machine.m_controllerTypeName, n"VendingMachineController")
       || Equals(this.machine.m_controllerTypeName, n"WeaponVendingMachineController")
       || Equals(this.machine.m_controllerTypeName, n"IceMachineController") {
         (this.machine as VendingMachine).StartShortGlitch(); // defined on VendingMachine
+        return;
       };
       if Equals(this.machine.m_controllerTypeName, n"ArcadeMachineController")
       || Equals(this.machine.m_controllerTypeName, n"PachinkoMachineController") {
-        (this.machine as ArcadeMachine).StartShortGlitch(); // defined on ArcadeMachine
+        let arcadeMachine = this.machine as ArcadeMachine;
+        arcadeMachine.isRepeatSpark = true;
+        arcadeMachine.StartShortGlitch(); // defined on ArcadeMachine
+        return;
       };
       if Equals(this.machine.m_controllerTypeName, n"DropPointController") {
         (this.machine as DropPoint).StartShortGlitch(); // defined on DropPoint
+        return;
       };
       if Equals(this.machine.m_controllerTypeName, n"ConfessionBoothController") {
         (this.machine as ConfessionBooth).StartShortGlitch(); // defined on ConfessionBooth
+        return;
       };
       if Equals(this.machine.m_controllerTypeName, n"DataTermController") {
         (this.machine as DataTerm).StartShortGlitch(); // defined on DataTerm
         // StartHoloFlicker() added to StartShortGlitch()
+        return;
+      };
+      if Equals(this.machine.m_controllerTypeName, n"JukeboxController") {
+        (this.machine as Jukebox).StartShortGlitch(); // defined on Jukebox
+        return;
       };
     };
   }
