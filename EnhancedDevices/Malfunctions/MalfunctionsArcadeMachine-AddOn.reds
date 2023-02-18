@@ -9,10 +9,10 @@ import EnhancedDevices.*
 // PachinkoMachineControllerPS <- ArcadeMachineControllerPS <- (BasicDistractionDeviceControllerPS) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 @wrapMethod(ArcadeMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected final func ResolveGameplayState() -> Void {
+protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
-  this.machineType = n"ArcadeMachineController";
+  // this.machineType = n"ArcadeMachineController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.arcadeMachineMalfunctionRate;
   if malfunctionRate == 0 { return; };

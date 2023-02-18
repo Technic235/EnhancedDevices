@@ -8,10 +8,10 @@ import EnhancedDevices.Settings.*
 // IceMachine(Controller)(PS)/WeaponMachine(Controller)(PS) <- VendingMachine(Controller)(PS) <-
 
 @wrapMethod(VendingMachine) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected final func ResolveGameplayState() -> Void {
+protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
-  this.machineType = n"VendingMachineController";
+  // this.machineType = n"VendingMachineController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.vendingMachineMalfunctionRate;
   if malfunctionRate == 0 { return; };

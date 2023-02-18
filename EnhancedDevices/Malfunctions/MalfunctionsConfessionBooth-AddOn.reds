@@ -7,10 +7,10 @@ import EnhancedDevices.Settings.*
 // ConfessionBoothControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 @wrapMethod(ConfessionBooth) // <- BasicDistractionDevice <- InteractiveDevice <-
-protected final func ResolveGameplayState() -> Void {
+protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
-  this.machineType = n"ConfessionBoothController";
+  // this.machineType = n"ConfessionBoothController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.confessionBoothMalfunctionRate;
   if malfunctionRate == 0 { return; };

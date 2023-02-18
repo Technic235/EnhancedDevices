@@ -1,4 +1,4 @@
-module EnhancedDevices.Malfunctions.Jukebox
+module EnhancedDevices.Malfunctions.Generic
 import EnhancedDevices.Malfunctions.*
 import EnhancedDevices.Settings.*
 
@@ -9,7 +9,7 @@ import EnhancedDevices.Settings.*
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func ResolveGameplayState() {
   wrappedMethod();
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
+  if !Equals(this.m_controllerTypeName, n"JukeboxController") {
     this.RestartDevice();
     // this.machineType = n"JukeboxController";
     let settings = new EVMMenuSettings();
@@ -26,22 +26,22 @@ protected func ResolveGameplayState() {
 
 // EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
-@addMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
-  if this.GetDevicePS().m_distractionTimeCompleted {
-    let delaySystem = GameInstance.GetDelaySystem(this.GetGame());
-    let callback = new EVMShortGlitchCallback();
-    callback.machine = this;
-    delaySystem.DelayCallback(callback, RandRangeF(2, 6), true);
-  };
-}
+// @addMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
+// protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
+//   if this.GetDevicePS().m_distractionTimeCompleted {
+//     let delaySystem = GameInstance.GetDelaySystem(this.GetGame());
+//     let callback = new EVMShortGlitchCallback();
+//     callback.machine = this;
+//     delaySystem.DelayCallback(callback, RandRangeF(2, 6), true);
+//   };
+// }
 
 // EVMShortGlitchCallback in Malfunctions
 
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
   wrappedMethod(glitchState, intensity);
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
+  if !Equals(this.m_controllerTypeName, n"JukeboxController") {
     let devicePS = this.GetDevicePS();
     if devicePS.evmHacksRemaining <= 0 {
       devicePS.EVMUnregisterShortGlitchMalfunction();
@@ -53,7 +53,7 @@ protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
 // called after OnQuickHackDistraction() and HackedEffect()
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
 protected func StopGlitching() {
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
+  if !Equals(this.m_controllerTypeName, n"JukeboxController") {
     if this.GetDevicePS().evmHacksRemaining > 0 { wrappedMethod(); };
   } else {
     wrappedMethod();
@@ -61,23 +61,20 @@ protected func StopGlitching() {
 }
 
 // provides some basic functionality when OnHit isnt installed.
-@if(!ModuleExists("EnhancedDevices.OnHit.Jukebox"))
+@if(!ModuleExists("EnhancedDevices.OnHit.Generic"))
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) { // hitEvents.script
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
-    if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
-    || Equals(devicePS.evmMalfunctionName, "broken") {
-      return;
-    };
+protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void { // hitEvents.script
+  let devicePS = this.GetDevicePS();
+//   if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
+//   || Equals(devicePS.evmMalfunctionName, "broken") {
+//     return;
+//   };
 
-    let devicePS = this.GetDevicePS();
+  if Equals(devicePS.evmMalfunctionName, "static")
+  && !Equals(this.m_controllerTypeName, n"JukeboxController") {
+    super.OnHitEvent(hit);
     if RandRangeF(0, 10) < 1.0 {
       GameObject.PlaySoundEvent(this, devicePS.GetGlitchSFX());
-    };
-    if devicePS.evmHacksRemaining > 0 {
-      wrappedMethod(hit);
-    } else {
-      super.OnHitEvent(hit);
     };
   } else {
     wrappedMethod(hit);

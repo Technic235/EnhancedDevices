@@ -7,10 +7,10 @@ import EnhancedDevices.Settings.*
 // DataTermControllerPS <- (skips BasicDistractionDevice) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 @wrapMethod(DataTerm) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected final func ResolveGameplayState() -> Void {
+protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
-  this.machineType = n"DataTermController";
+  // this.machineType = n"DataTermController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.travelTerminalMalfunctionRate;
   if malfunctionRate == 0 { return; };
