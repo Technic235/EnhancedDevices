@@ -11,33 +11,24 @@ protected func RestartDevice() {
   devicePS.EVMUnregisterHoloFlicker();
   devicePS.SetDeviceState(EDeviceStatus.ON);
   this.m_uiComponent.Toggle(true);
-  if !Equals(devicePS.evmMalfunctionName, "glitch") {
-    devicePS.evmMalfunctionName = "";
-  } else { // keeps the short glitch malfunction if it already had one
-    devicePS.evmHacksRemaining = 1; // this must go before StartGlitching to prevent items from dispensing
-    this.EVMSetupShortGlitchListener();
-    return;
-  };
 }
 
-@addField(InteractiveDevice)
-let machineType: CName;
+// @addField(InteractiveDevice) let machineType: CName;
 
 // called by DropPoint/VendingMachine/ArcadeMachine-ResolveGameplayState() in Malfunctions
 @addMethod(InteractiveDevice) // <- (one-layer discrepancy) <- Device <- DeviceBase <-
 protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) {
-  if Equals(this.machineType, n"JukeboxController") { // Jukebox.script is on a ton of random devices
-    if Equals(this.m_controllerTypeName, n"JukeboxController") { // but m_controllerTypeName gets overwritten on those devices
+  // if Equals(this.machineType, n"JukeboxController") { // Jukebox.script is on a ton of random devices
+  //   if Equals(this.m_controllerTypeName, n"JukeboxController") { // but m_controllerTypeName gets overwritten on those devices
       this.ActivateStartingMalfunction(shortLimit, staticLimit, brokenLimit);
-    } else {
-      this.machineType = n"";
-    };
-  } else {
-    if !Equals(this.machineType, n"") {
-      this.ActivateStartingMalfunction(shortLimit, staticLimit, brokenLimit);
-    };
-  };
-  return;
+  //   } else {
+  //     this.machineType = n"";
+  //   };
+  // } else {
+  //   if !Equals(this.machineType, n"") {
+  //     this.ActivateStartingMalfunction(shortLimit, staticLimit, brokenLimit);
+  //   };
+  // };
 }
 
 
@@ -45,12 +36,12 @@ protected func SetStartingMalfunction(shortLimit:Float, staticLimit:Float, broke
 protected func ActivateStartingMalfunction(shortLimit:Float, staticLimit:Float, brokenLimit:Float) {
   let devicePS = this.GetDevicePS();
   let randomNum = RandRangeF(0, 1);
-  if 0.0 < randomNum && randomNum <= shortLimit {
+  if 0.0 < randomNum && randomNum <= shortLimit { // if randomNum falls within the glitch range
     devicePS.evmHacksRemaining = 1;
     this.EVMSetupShortGlitchListener(); // malfunction = glitch
     return;
   };
-  if randomNum <= staticLimit {
+  if randomNum <= staticLimit { // if randomNum falls within the static range
     devicePS.evmMalfunctionName = "static"; // this must go before StartGlitching to prevent items from dispensing
     if Equals(this.m_controllerTypeName, n"DropPointController") { // cb func OnQuickHackDistraction is on BasicDistractionDevice & Device so 2 hacks get subtracted every hack
       devicePS.evmHacksRemaining = -1; // so set StopGlitching to work if hacksRemaining is ">= 0" instead of "> 0" to counteract the double subtract
@@ -59,19 +50,20 @@ protected func ActivateStartingMalfunction(shortLimit:Float, staticLimit:Float, 
     };
     (this as VendingMachine).LoudVendingMachines(false);
     if Equals(this.m_controllerTypeName, n"JukeboxController") {
-      let jukebox = this as Jukebox;
-      let SFXcache = jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX;
-      jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX = n"";
+      let jukeboxPS = (this as Jukebox).GetDevicePS();
+      let SFXcache = jukeboxPS.m_jukeboxSetup.m_glitchSFX;
+      jukeboxPS.m_jukeboxSetup.m_glitchSFX = n"";
       this.StartGlitching(EGlitchState.DEFAULT, 1.0); // this invokes HackedEffect
-      jukebox.GetDevicePS().m_jukeboxSetup.m_glitchSFX = SFXcache;
+      jukeboxPS.m_jukeboxSetup.m_glitchSFX = SFXcache; // restore the SFX so it works for OnHitEvent()
     } else {
       this.StartGlitching(EGlitchState.DEFAULT, 1.0); // this invokes HackedEffect
     };
     return;
   };
-  if randomNum <= brokenLimit {
+  if randomNum <= brokenLimit { // if randomNum falls within the broken range
     this.EVMShutDownMachine(); // malfunction = broken
   };
+  // if randomNum falls outside of all ranges, do nothing
 }
 
     // if Equals(this.m_controllerTypeName, n"ArcadeMachineController")
@@ -137,9 +129,19 @@ public class EVMShortGlitchCallback extends DelayCallback {
         return;
       };
       if Equals(this.machine.m_controllerTypeName, n"JukeboxController") {
-        (this.machine as Jukebox).StartShortGlitch(); // defined on Jukebox
-        return;
+        (this.machine as Jukebox).JukeboxGlitch(this.machine as Jukebox);
+        return; // Jukebox is the only machine that has a custom StartShortGlitch() function
       };
     };
   }
+}
+
+@if(!ModuleExists("EnhancedDevices.Jukebox"))
+@addMethod(Jukebox)
+protected func JukeboxGlitch(jukebox:ref<Jukebox>) {}
+
+@if(ModuleExists("EnhancedDevices.Jukebox"))
+@addMethod(Jukebox)
+protected func JukeboxGlitch(jukebox:ref<Jukebox>) {
+  jukebox.StartShortGlitch(); // defined on Jukebox
 }

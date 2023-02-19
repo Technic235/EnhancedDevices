@@ -3,7 +3,7 @@ module EnhancedDevices.ModuleConfig
 @addField(ScriptableDeviceComponentPS) let moduleExistsOnHitVendingMachine: Bool = false;
 @addField(ScriptableDeviceComponentPS) let moduleExistsOnHitArcadeMachine: Bool = false;
 // @addField(ScriptableDeviceComponentPS) let moduleExistsOnHitTravelTerminal: Bool = false;
-// @addField(ScriptableDeviceComponentPS) let moduleExistsOnHitJukebox: Bool = false;
+@addField(ScriptableDeviceComponentPS) let moduleExistsOnHitJukebox: Bool = false;
 
 @addField(ScriptableDeviceComponentPS) let moduleExistsHackingVendingMachine: Bool = false;
 @addField(ScriptableDeviceComponentPS) let moduleExistsHackingArcadeMachine: Bool = false;
@@ -41,12 +41,12 @@ protected cb func OnInstantiated() {
 //   wrappedMethod();
 // }
 
-// @if(ModuleExists("EnhancedDevices.OnHit.Jukebox"))
-// @wrapMethod(ScriptableDeviceComponentPS)
-// protected cb func OnInstantiated() {
-//   this.moduleExistsOnHitJukebox = true;
-//   wrappedMethod();
-// }
+@if(ModuleExists("EnhancedDevices.OnHit.Jukebox"))
+@wrapMethod(ScriptableDeviceComponentPS)
+protected cb func OnInstantiated() {
+  this.moduleExistsOnHitJukebox = true;
+  wrappedMethod();
+}
 
 @if(ModuleExists("EnhancedDevices.Hacking.VendingMachine"))
 @wrapMethod(ScriptableDeviceComponentPS)

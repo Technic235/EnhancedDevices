@@ -13,16 +13,17 @@ module EnhancedDevices.Jukebox.RadioFix
 
 @addMethod(JukeboxControllerPS)
 protected cb func OnInstantiated() { // from RadioControllerPS
-	super.OnInstantiated();
-	this.InitializeStations();
-	this.m_isInteractive = true;
+  super.OnInstantiated();
+  this.InitializeStations();
+  this.m_isInteractive = true;
 }
 
 @wrapMethod(JukeboxControllerPS)
 protected func InitializeStations() { // from RadioControllerPS
-	if this.m_stationsInitialized { return; };
+  if this.m_stationsInitialized { return; };
   wrappedMethod();
-	this.m_stationsInitialized = true;
+  this.m_startingStation = RandRange(0, ArraySize(this.m_stations));
+  this.m_stationsInitialized = true;
 }
 
 // @addMethod(JukeboxControllerPS)
@@ -65,32 +66,32 @@ protected cb func OnPreviousStation(evt:ref<PreviousStation>) {
 
 @addMethod(JukeboxControllerPS)
 protected func ActionPausePlay() -> ref<TogglePlay> {
-	let action = new TogglePlay();
-	action.SetUp(this);
-	action.SetProperties(this.m_isPlaying);
-	action.AddDeviceName(this.m_deviceName);
-	action.CreateActionWidgetPackage();
-	return action;
+  let action = new TogglePlay();
+  action.SetUp(this);
+  action.SetProperties(this.m_isPlaying);
+  action.AddDeviceName(this.m_deviceName);
+  action.CreateActionWidgetPackage();
+  return action;
 }
 
 @addField(JukeboxControllerPS) let m_startingStation: Int32 = 0;
 
 @addMethod(Jukebox)
 public func ResavePersistentData(ps:ref<PersistentState>) -> Bool { // from Radio
-		super.ResavePersistentData(ps);
-    let devicePS = this.GetDevicePS();
-		let mediaData: MediaResaveData;
-		mediaData.m_mediaDeviceData.m_initialStation = devicePS.m_startingStation;
-		mediaData.m_mediaDeviceData.m_amountOfStations = ArraySize(devicePS.m_stations);
-		mediaData.m_mediaDeviceData.m_activeChannelName = devicePS.m_stations[devicePS.m_startingStation].channelName;
-		mediaData.m_mediaDeviceData.m_isInteractive = devicePS.m_isInteractive;
-		let radioData: RadioResaveData;
-		radioData.m_mediaResaveData = mediaData;
-		radioData.m_stations = devicePS.m_stations;
-		let psDevice: ref<RadioControllerPS>;
-		psDevice.PushResaveData(radioData);
-		return true;
-	}
+  super.ResavePersistentData(ps);
+  let devicePS = this.GetDevicePS();
+  let mediaData: MediaResaveData;
+  mediaData.m_mediaDeviceData.m_initialStation = devicePS.m_startingStation;
+  mediaData.m_mediaDeviceData.m_amountOfStations = ArraySize(devicePS.m_stations);
+  mediaData.m_mediaDeviceData.m_activeChannelName = devicePS.m_stations[devicePS.m_startingStation].channelName;
+  mediaData.m_mediaDeviceData.m_isInteractive = devicePS.m_isInteractive;
+  let radioData: RadioResaveData;
+  radioData.m_mediaResaveData = mediaData;
+  radioData.m_stations = devicePS.m_stations;
+  let psDevice: ref<RadioControllerPS>;
+  psDevice.PushResaveData(radioData);
+  return true;
+}
 
 // 	// default m_tweakDBDescriptionRecord = T"device_descriptions.Radio";
 // // @addField(JukeboxControllerPS) let m_radioSetup: RadioSetup;

@@ -7,10 +7,10 @@ import EnhancedDevices.Settings.*
 // DropPointControllerPS <- BasicDistractionDeviceControllerPS <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 @wrapMethod(DropPoint) // <- BasicDistractionDevice <- InteractiveDevice <-
-protected final func ResolveGameplayState() -> Void {
+protected func ResolveGameplayState() -> Void {
   wrappedMethod();
   this.RestartDevice();
-  this.machineType = n"DropPointController";
+  // this.machineType = n"DropPointController";
   let settings = new EVMMenuSettings();
   let malfunctionRate: Int32 = settings.dropPointMalfunctionRate;
   if malfunctionRate == 0 { return; };

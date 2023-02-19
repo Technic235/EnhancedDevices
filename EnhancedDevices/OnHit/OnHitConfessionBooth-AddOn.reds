@@ -10,7 +10,7 @@ import EnhancedDevices.Settings.*
 protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
   let devicePS = this.GetDevicePS();
   if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
-  || !Equals(devicePS.evmMalfunctionName, "broken") {
+  && !Equals(devicePS.evmMalfunctionName, "broken") {
     let settings = new EVMMenuSettings();
     if Equals(settings.onHitConfessionBooth, false) {
       wrappedMethod(hit); // default behavior

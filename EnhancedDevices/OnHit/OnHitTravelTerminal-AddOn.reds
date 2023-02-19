@@ -11,7 +11,7 @@ protected cb func OnHitEvent(hit:ref<gameHitEvent>) -> Void {
   this.StartHoloFlicker();
   this.EVMSetupHoloFlickerListener();
   if !Equals(this.GetCurrentGameplayRole(), EGameplayRole.None)
-  || !Equals(devicePS.evmMalfunctionName, "broken") {
+  && !Equals(devicePS.evmMalfunctionName, "broken") {
     let settings = new EVMMenuSettings();
     if Equals(settings.onHitTravelTerminal, false) {
       wrappedMethod(hit); // default behavior
