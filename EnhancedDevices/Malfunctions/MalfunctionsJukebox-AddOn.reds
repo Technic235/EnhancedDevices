@@ -7,27 +7,24 @@ import EnhancedDevices.Settings.*
 // JukeboxControllerPS <- (skips BasicDistractionDevice) <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected func ResolveGameplayState() {
-  wrappedMethod();
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
-    this.RestartDevice();
-    // this.machineType = n"JukeboxController";
-    let settings = new EVMMenuSettings();
-    let malfunctionRate: Int32 = settings.jukeboxMalfunctionRate;
-    if malfunctionRate == 0 { return; };
-    let totalSum: Int32 = settings.jukeboxStatic + settings.jukeboxGlitch + settings.jukeboxBroken;
-    if totalSum == 0 { totalSum = 1; };
-    let shortLimit = Cast<Float>(settings.jukeboxGlitch) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0;
-    let staticLimit = Cast<Float>(settings.jukeboxStatic) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0 + shortLimit;
-    let brokenLimit = Cast<Float>(settings.jukeboxBroken) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0 + staticLimit;
-    this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
-  };
+protected cb func OnTakeControl(ri:EntityResolveComponentsInterface) { // ResolveGameplayState() not defined on Jukebox, but OnTakeControl() is
+  wrappedMethod(ri);
+  this.RestartDevice();
+  let settings = new EVMMenuSettings();
+  let malfunctionRate: Int32 = settings.jukeboxMalfunctionRate;
+  if malfunctionRate == 0 { return; };
+  let totalSum: Int32 = settings.jukeboxStatic + settings.jukeboxGlitch + settings.jukeboxBroken;
+  if totalSum == 0 { totalSum = 1; };
+  let shortLimit = Cast<Float>(settings.jukeboxGlitch) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0;
+  let staticLimit = Cast<Float>(settings.jukeboxStatic) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0 + shortLimit;
+  let brokenLimit = Cast<Float>(settings.jukeboxBroken) / Cast<Float>(totalSum) * Cast<Float>(malfunctionRate) / 100.0 + staticLimit;
+  this.SetStartingMalfunction(shortLimit, staticLimit, brokenLimit);
 }
 
 // EVMSetupShortGlitchListener() & EVMShortGlitchEvent in Malfunctions
 
 @addMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
+protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) { // custom event
   if this.GetDevicePS().m_distractionTimeCompleted {
     let delaySystem = GameInstance.GetDelaySystem(this.GetGame());
     let callback = new EVMShortGlitchCallback();
@@ -39,45 +36,38 @@ protected cb func OnEVMShortGlitchEvent(evt:ref<EVMShortGlitchEvent>) {
 // EVMShortGlitchCallback in Malfunctions
 
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) {
+protected func StartGlitching(glitchState:EGlitchState, opt intensity:Float) { // defined on Jukebox
   wrappedMethod(glitchState, intensity);
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
-    let devicePS = this.GetDevicePS();
-    if devicePS.evmHacksRemaining <= 0 {
-      devicePS.EVMUnregisterShortGlitchMalfunction();
-      devicePS.evmMalfunctionName = "static";
-    };
+  let devicePS = this.GetDevicePS();
+  if devicePS.evmHacksRemaining <= 0 {
+    devicePS.EVMUnregisterShortGlitchMalfunction();
+    devicePS.evmMalfunctionName = "static";
   };
 }
 
 // called after OnQuickHackDistraction() and HackedEffect()
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected func StopGlitching() {
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
-    if this.GetDevicePS().evmHacksRemaining > 0 { wrappedMethod(); };
-  } else {
-    wrappedMethod();
-  };
+protected func StopGlitching() { // defined on Jukebox
+  if this.GetDevicePS().evmHacksRemaining > 0 { wrappedMethod(); };
 }
 
 // provides some basic functionality when OnHit isnt installed.
 @if(!ModuleExists("EnhancedDevices.OnHit.Jukebox"))
 @wrapMethod(Jukebox) // <- (skips BasicDistractionDevice) <- InteractiveDevice <-
-protected cb func OnHitEvent(hit:ref<gameHitEvent>) { // hitEvents.script
-  if Equals(this.m_controllerTypeName, n"JukeboxController") {
+protected cb func OnHitEvent(hit:ref<gameHitEvent>) { // defined on Device
+  if this.IsA(n"Jukebox") {
+    let devicePS = this.GetDevicePS();
     if Equals(this.GetCurrentGameplayRole(), EGameplayRole.None) // if not assigned "Distract" role
     || Equals(devicePS.evmMalfunctionName, "broken") {
       return;
     };
 
-    let devicePS = this.GetDevicePS();
+    wrappedMethod(hit); // triggers security but doesn't cancel glitching
+    if devicePS.evmHacksRemaining > 0 {
+      this.StartShortGlitch();
+    };
     if RandRangeF(0, 10) < 1.0 {
       GameObject.PlaySoundEvent(this, devicePS.GetGlitchSFX());
-    };
-    if devicePS.evmHacksRemaining > 0 {
-      wrappedMethod(hit);
-    } else {
-      super.OnHitEvent(hit);
     };
   } else {
     wrappedMethod(hit);
