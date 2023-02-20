@@ -8,22 +8,28 @@ module EnhancedDevices.Jukebox.RadioFix
 // // RadioController <- MediaDeviceController <- ScriptableDeviceComponent <- (skips) <- DeviceComponent <-
 // // RadioControllerPS <- MediaDeviceController <- ScriptableDeviceComponentPS <- SharedGameplayPS <- DeviceComponentPS <-
 
-// // from RadioControllerPS
+@wrapMethod(JukeboxControllerPS)
+protected cb func OnInstantiated() { // defined on ScriptableDeviceComponentPS
+  if this.IsA(n"JukeboxControllerPS") {
+    this.m_isInitialized = false;
+  };
+}
+
+// from RadioControllerPS
 @addField(JukeboxControllerPS) let m_stationsInitialized: Bool;
 
-@addMethod(JukeboxControllerPS)
-protected cb func OnInstantiated() { // from RadioControllerPS
-  super.OnInstantiated();
-  this.InitializeStations();
-  this.m_isInteractive = true;
+@wrapMethod(JukeboxControllerPS)
+protected func InitializeStations() { // defined on JukeboxControllerPS
+  if !this.m_stationsInitialized {
+    wrappedMethod();
+    this.m_stationsInitialized = true;
+  };
 }
 
 @wrapMethod(JukeboxControllerPS)
-protected func InitializeStations() { // from RadioControllerPS
-  if this.m_stationsInitialized { return; };
+protected func GameAttached() { // defined on JukeboxControllerPS
   wrappedMethod();
-  this.m_startingStation = RandRange(0, ArraySize(this.m_stations));
-  this.m_stationsInitialized = true;
+  this.m_activeStation = RandRange(0, ArraySize(this.m_stations));
 }
 
 // @addMethod(JukeboxControllerPS)
@@ -47,7 +53,7 @@ protected func InitializeStations() { // from RadioControllerPS
 // }
 
 @wrapMethod(Jukebox)
-protected cb func OnNextStation(evt:ref<NextStation>) {
+protected cb func OnNextStation(evt:ref<NextStation>) { // defined on Jukebox (& JukeboxControllerPS)
   wrappedMethod(evt);
   let devicePS = this.GetDevicePS();
   if !devicePS.m_isPlaying {
@@ -56,7 +62,7 @@ protected cb func OnNextStation(evt:ref<NextStation>) {
 }
 
 @wrapMethod(Jukebox)
-protected cb func OnPreviousStation(evt:ref<PreviousStation>) {
+protected cb func OnPreviousStation(evt:ref<PreviousStation>) { // defined on Jukebox (& JukeboxControllerPS)
   wrappedMethod(evt);
   let devicePS = this.GetDevicePS();
   if !devicePS.m_isPlaying {
@@ -65,7 +71,7 @@ protected cb func OnPreviousStation(evt:ref<PreviousStation>) {
 }
 
 @addMethod(JukeboxControllerPS)
-protected func ActionPausePlay() -> ref<TogglePlay> {
+protected func ActionPausePlay() -> ref<TogglePlay> { // custom function
   let action = new TogglePlay();
   action.SetUp(this);
   action.SetProperties(this.m_isPlaying);
@@ -73,79 +79,3 @@ protected func ActionPausePlay() -> ref<TogglePlay> {
   action.CreateActionWidgetPackage();
   return action;
 }
-
-@addField(JukeboxControllerPS) let m_startingStation: Int32 = 0;
-
-@addMethod(Jukebox)
-public func ResavePersistentData(ps:ref<PersistentState>) -> Bool { // from Radio
-  super.ResavePersistentData(ps);
-  let devicePS = this.GetDevicePS();
-  let mediaData: MediaResaveData;
-  mediaData.m_mediaDeviceData.m_initialStation = devicePS.m_startingStation;
-  mediaData.m_mediaDeviceData.m_amountOfStations = ArraySize(devicePS.m_stations);
-  mediaData.m_mediaDeviceData.m_activeChannelName = devicePS.m_stations[devicePS.m_startingStation].channelName;
-  mediaData.m_mediaDeviceData.m_isInteractive = devicePS.m_isInteractive;
-  let radioData: RadioResaveData;
-  radioData.m_mediaResaveData = mediaData;
-  radioData.m_stations = devicePS.m_stations;
-  let psDevice: ref<RadioControllerPS>;
-  psDevice.PushResaveData(radioData);
-  return true;
-}
-
-// 	// default m_tweakDBDescriptionRecord = T"device_descriptions.Radio";
-// // @addField(JukeboxControllerPS) let m_radioSetup: RadioSetup;
-// // @addField(JukeboxControllerPS) let m_stations: array<RadioStationsMap>; // already defined on this class
-// // ^ from RadioControllerPS ^
-
-// // from MediaDeviceControllerPS
-// // @addField(JukeboxControllerPS) let m_previousStation: Int32; // //
-// @addField(JukeboxControllerPS) let m_activeChannelName: String;
-// // @addField(JukeboxControllerPS) persistent let m_dataInitialized: Bool;
-// @addField(JukeboxControllerPS) persistent let m_amountOfStations: Int32;
-// // ^ from MediaDeviceControllerPS ^
-
-// @wrapMethod(Jukebox)
-// protected cb func OnRequestComponents(ri:EntityRequestComponentsInterface) { // from Radio
-//   wrappedMethod(ri);
-// 	EntityRequestComponentsInterface.RequestComponent(ri, n"audio", n"soundComponent", false);
-// }
-
-// @wrapMethod(JukeboxControllerPS)
-// protected func GameAttached() { // from RadioControllerPS
-//   wrappedMethod();
-// 	this.InitializeRadioStations(); // this & below from RadioControllerPS
-// 	this.m_amountOfStations = ArraySize(this.m_stations);
-// 	this.m_activeChannelName = this.m_stations[this.m_activeStation].channelName;
-// }
-
-// @addMethod(JukeboxControllerPS)
-// public const func GetStationByIndex(index:Int32) -> RadioStationsMap { // from RadioControllerPS
-// 	let invalidStation: RadioStationsMap;
-// 	if index < 0 || index >= ArraySize(this.m_stations) {
-//     return invalidStation;
-// 	};
-// 	return this.m_stations[index];
-// }
-
-// @replaceMethod(Jukebox)
-// protected func PlayGivenStation() { // from Radio
-//   let devicePS = this.GetDevicePS();
-// 	let stationIndex = devicePS.GetActiveStationIndex();
-// 	let station = devicePS.GetStationByIndex(stationIndex);
-// 	GameObject.AudioSwitch(this, n"radio_station", station.soundEvent, n"radio");
-// 	let isMetal = Equals(station.soundEvent, n"radio_station_11_metal") ? true : false;
-//   this.MetalItUp(isMetal);
-// }
-
-// @addMethod(Jukebox)
-// private func MetalItUp(isMetal:Bool) { // from Radio
-//   let devicePS = this.GetDevicePS();
-// 	if !Equals(devicePS.GetDurabilityType(), EDeviceDurabilityType.INVULNERABLE) {
-// 		if isMetal {
-// 			devicePS.SetDurabilityType(EDeviceDurabilityType.INDESTRUCTIBLE);
-// 		} else {
-// 			devicePS.SetDurabilityType(EDeviceDurabilityType.DESTRUCTIBLE);
-// 		};
-// 	};
-// }
